@@ -15,9 +15,9 @@ __Кроки встанолення:__
    ![This is an image](https://github.com/eugene-hliebov/readME_files/blob/main/Docker%20Desktop%20Filesharing.png)
 5. Після завершення, відкриваємо термінал в контейнері app:
    - Якщо у вас встановлено в VSCode плагін Docker:  
-     ![This is an image](https://github.com/eugene-hliebov/readME_files/blob/main/Docker%20Desktop%20Filesharing.png)
-   - Якщо ні, то в Docker Desktop:  
-     ![This is an image](https://github.com/eugene-hliebov/readME_files/blob/main/Docker%20Desktop%20Filesharing.png)
+     ![This is an image](https://github.com/eugene-hliebov/readME_files/blob/main/docker_app_attach_shell.png)
+   - Якщо ні, то в Docker Desktop, open terminal:  
+     ![This is an image](https://github.com/eugene-hliebov/readME_files/blob/main/docker_app_open_terminall.png)
 6. Вводимо команди:  
    ```
    composer instal
