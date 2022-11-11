@@ -163,3 +163,122 @@ __Що, де і як можна змінювати!!!__
    ```html
    <img src="../img/ваша_папка/ваше_зображення.розширення" alt="">
    ```
+</br>
+</br>
+</br>  
+
+Мій приклад створення таблиці на основі PhotoArchives (УВАЖНО):  
+1. Створення моделі файлу та налаштування міграцій (відкрити термінал в контейнері app)
+    ```
+    php artisan make:model PhotoArchives -m
+    ```
+2. Далі відкрийте файл міграції для визначення значень таблиці в базі даних для зберігання інформації про завантажений файл. Перейдіть до файлу database/migrations/......_create_photo_archives_table і визначте значення таблиці.
+    ```php
+    <?php
+
+    use Illuminate\Database\Migrations\Migration;
+    use Illuminate\Database\Schema\Blueprint;
+    use Illuminate\Support\Facades\Schema;
+
+    return new class extends Migration
+    {
+        /**
+         * Run the migrations.
+         *
+         * @return void
+         */
+        public function up()
+        {
+            Schema::create('photo_archives', function (Blueprint $table) {
+                $table->id();
+                $table->timestamps();
+                $table->integer('user_id');
+                $table->string('filename');
+                $table->text('description')->nullable();
+                $table->integer('count_likes')->nullable();
+                $table->integer('count_complains')->nullable();
+                $table->boolean('shadow_ban')->default(false);
+            });
+        }
+
+        /**
+         * Reverse the migrations.
+         *
+         * @return void
+         */
+        public function down()
+        {
+            Schema::dropIfExists('photo_archives');
+        }
+    };
+    ```
+3. Тепер додайте властивість $fillable у модель File. Відкрийте файл app/Models/PhotoArchives.php і розмістіть наступний код.
+    ```php
+    <?php
+
+    namespace App\Models;
+
+    use Illuminate\Database\Eloquent\Factories\HasFactory;
+    use Illuminate\Database\Eloquent\Model;
+
+    class PhotoArchives extends Model
+    {
+        use HasFactory;
+        protected $fillable = [
+            'user_id',
+            'filename',
+            'description',
+            'count_likes',
+            'count_complains',
+            'shadow_ban'
+        ];
+    }
+    ```
+4. Тепер ви готові до запуску міграції. Ви також можете побачити оновлення в базі даних mysql.
+    ```
+    php artisan migrate
+    ```
+5. Створимо контролер завантаження файлів.В папці app/Http/Controllers створимо свою паппу в PhotoArchives. Далі Виконайте команду для створення контролера.
+    ```
+    php artisan make:controller PhotoArchives/PhotoUploadController --resource
+    ```
+    Відкрийте файл app/Http/Controllers/FileUpload.php , і нам потрібно визначити логіку для завантаження, зберігання, редагування, оновлення і видалення данних:
+    -   в index()
+        ```php
+        public function index()
+        {
+            $photos = PhotoArchives::all();
+            return view('/test', compact('photos'));
+        }
+        ```
+    -   в store() (для вашої таблиці, те в функції може бути інше, все залежить, що ви хочете завантажити у таблицю)
+        ```php
+        public function store(Request $request)
+        {
+            $request->validate([
+                'image' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+                'user_id' => 'required|numeric',
+                'description' => 'required|max:255',
+                'region' => 'required|max:255'
+            ]);
+
+            $imageRequest = $request->image;
+            $imageRequest->move(public_path('img/photo-archives'), $imageRequest->hashName());
+
+            $image = new PhotoArchives();
+            $image->user_id = $request->user_id;
+            $image->filename = $imageRequest->hashName();
+            $image->origin = $imageRequest->getClientOriginalName();
+            $image->description = $request->description;
+            $image->region = $request->region;
+            $image->save(); 
+
+            return back()->with('success', 'Image uploaded Successfully!');
+        }
+        ```
+        
+
+
+
+
+
